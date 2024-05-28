@@ -8,10 +8,27 @@ namespace SuggestionService.Service
     {
         private readonly ISuggestionRepository _suggestionRepository;
         private readonly IMessageBusService _messageBusService;
-        public SuggestionService(ISuggestionRepository suggestionRepository, IMessageBusService messageBusService)
+        private readonly IConfiguration _configuration;
+        private readonly int upVotesTarget;
+        private readonly int downVotesTarget;
+        public SuggestionService(ISuggestionRepository suggestionRepository, IMessageBusService messageBusService, IConfiguration configuration)
         {
             _suggestionRepository = suggestionRepository;
             _messageBusService = messageBusService;
+            _configuration = configuration;
+
+            upVotesTarget = 3;
+            downVotesTarget = 3;
+
+            if (int.TryParse(_configuration["SuggestionServiceConfig:UpVotesTarget"], out int upVotes))
+            {
+                upVotesTarget = upVotes;
+            }
+
+            if (int.TryParse(_configuration["SuggestionServiceConfig:DownVotesTarget"], out int downVotes))
+            {
+                downVotesTarget = downVotes;
+            }
         }
         public async Task CheckSuggestionAsync(SuggestionDTO suggestionDTO)
         {
@@ -52,7 +69,7 @@ namespace SuggestionService.Service
             if (suggestionVoteDTO.IsValid)
             {
                 suggestionVote.Upvotes++;
-                if (suggestionVote.Upvotes >= 2)
+                if (suggestionVote.Upvotes >= upVotesTarget)
                 {
                     var suggestionVoteMessage = new SuggestionVoteMessage
                     {
@@ -69,7 +86,7 @@ namespace SuggestionService.Service
             else
             {
                 suggestionVote.Downvotes++;
-                if (suggestionVote.Downvotes >= 2)
+                if (suggestionVote.Downvotes >= downVotesTarget)
                 {
                     var suggestionVoteMessage = new SuggestionVoteMessage
                     {

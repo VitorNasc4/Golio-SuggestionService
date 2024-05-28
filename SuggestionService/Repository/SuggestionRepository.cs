@@ -6,13 +6,15 @@ namespace SuggestionService.Repository
 {
     public class SuggestionRepository : ISuggestionRepository
     {
+        private readonly IConfiguration _configuration;
         private readonly IMongoCollection<Suggestion> _suggestionCollection;
-        public SuggestionRepository()
+        public SuggestionRepository(IConfiguration configuration)
         {
-            var mongoClient = new MongoClient("mongodb://localhost:27017");
-            var mongoDatabase = mongoClient.GetDatabase("GolioSuggestionServiceDB");
+            _configuration = configuration;
+            var mongoClient = new MongoClient(_configuration["SuggestionServiceDB:ConnectionString"]);
+            var mongoDatabase = mongoClient.GetDatabase(_configuration["SuggestionServiceDB:Database"]);
 
-            _suggestionCollection = mongoDatabase.GetCollection<Suggestion>("Suggestions");
+            _suggestionCollection = mongoDatabase.GetCollection<Suggestion>(_configuration["SuggestionServiceDB:CollectionName"]);
         }
         public async Task<Suggestion> GetSuggestionByIdAsync(int id)
         {
