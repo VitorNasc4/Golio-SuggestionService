@@ -1,0 +1,16 @@
+version: '3.5'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: suggestion_mongodb
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  Golio-db:

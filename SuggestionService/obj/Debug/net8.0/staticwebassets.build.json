@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "1bX72RXq2OZEizkG6Gdbct2MUIJVIzQ5Hm7SJ3SGP90=",
+  "Source": "SuggestionService",
+  "BasePath": "_content/SuggestionService",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
