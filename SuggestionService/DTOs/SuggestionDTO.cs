@@ -17,6 +17,7 @@ namespace SuggestionService.DTOs
                 Value = Value,
                 AutorName = AutorName,
                 AutorEmail = AutorEmail,
+                VotesAutorEmails = new List<string>(),
                 Upvotes = 0,
                 Downvotes = 0,
                 CreatedAt = DateTime.UtcNow,

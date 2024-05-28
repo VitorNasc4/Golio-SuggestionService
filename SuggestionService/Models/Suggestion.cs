@@ -16,6 +16,7 @@ namespace SuggestionService.Models
         public string? AutorName { get; set; }
         public string? AutorEmail { get; set; }
         public int Upvotes { get; set; }
+        public List<string> VotesAutorEmails { get; set; } = new List<string>();
         public int Downvotes { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
@@ -32,4 +33,5 @@ namespace SuggestionService.Models
             };
         }
     }
+
 }

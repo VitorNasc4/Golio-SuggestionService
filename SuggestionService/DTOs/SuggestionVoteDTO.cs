@@ -6,6 +6,7 @@ namespace SuggestionService.DTOs
     {
         public int SuggestionId { get; set; }
         public bool IsValid { get; set; }
+        public string? EmailAutor { get; set; }
     }
 
 }

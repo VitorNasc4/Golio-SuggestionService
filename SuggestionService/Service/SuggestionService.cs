@@ -58,24 +58,33 @@ namespace SuggestionService.Service
         }
         public async Task CheckSuggestionVoteAsync(SuggestionVoteDTO suggestionVoteDTO)
         {
-            var suggestionVote = await _suggestionRepository.GetSuggestionByIdAsync(suggestionVoteDTO.SuggestionId);
+            var suggestion = await _suggestionRepository.GetSuggestionByIdAsync(suggestionVoteDTO.SuggestionId);
 
-            if (suggestionVote is null)
+            if (suggestion is null)
             {
                 Console.WriteLine($"Suggestion with ID {suggestionVoteDTO.SuggestionId} not found");
                 return;
             }
 
+            foreach (var autorVoteEamil in suggestion.VotesAutorEmails)
+            {
+                if (autorVoteEamil == suggestionVoteDTO.EmailAutor)
+                {
+                    Console.WriteLine($"This suggestion vote has already evaluated by autor email {suggestionVoteDTO.EmailAutor}");
+                    return;
+                }
+            }
+
             if (suggestionVoteDTO.IsValid)
             {
-                suggestionVote.Upvotes++;
-                if (suggestionVote.Upvotes >= upVotesTarget)
+                suggestion.Upvotes++;
+                if (suggestion.Upvotes >= upVotesTarget)
                 {
                     var suggestionVoteMessage = new SuggestionVoteMessage
                     {
                         SuggestionId = suggestionVoteDTO.SuggestionId,
-                        PriceId = suggestionVote.PriceId,
-                        Value = suggestionVote.Value,
+                        PriceId = suggestion.PriceId,
+                        Value = suggestion.Value,
                         IsValid = true
                     };
                     await _messageBusService.SendMessageQueueAsync(suggestionVoteMessage);
@@ -85,14 +94,14 @@ namespace SuggestionService.Service
             }
             else
             {
-                suggestionVote.Downvotes++;
-                if (suggestionVote.Downvotes >= downVotesTarget)
+                suggestion.Downvotes++;
+                if (suggestion.Downvotes >= downVotesTarget)
                 {
                     var suggestionVoteMessage = new SuggestionVoteMessage
                     {
                         SuggestionId = suggestionVoteDTO.SuggestionId,
-                        PriceId = suggestionVote.PriceId,
-                        Value = suggestionVote.Value,
+                        PriceId = suggestion.PriceId,
+                        Value = suggestion.Value,
                         IsValid = false
                     };
                     await _messageBusService.SendMessageQueueAsync(suggestionVoteMessage);
@@ -100,9 +109,10 @@ namespace SuggestionService.Service
                     return;
                 }
             }
-            suggestionVote.UpdatedAt = DateTime.UtcNow;
+            suggestion.UpdatedAt = DateTime.UtcNow;
+            suggestion.VotesAutorEmails.Add(suggestionVoteDTO.EmailAutor);
 
-            await _suggestionRepository.UpdateSuggestionAsync(suggestionVoteDTO.SuggestionId, suggestionVote);
+            await _suggestionRepository.UpdateSuggestionAsync(suggestionVoteDTO.SuggestionId, suggestion);
         }
     }
 }
